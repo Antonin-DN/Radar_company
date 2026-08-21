@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Radar société",
+  "version": "0.2.0",
+  "description": "Détecte le SIREN/SIRET sur la page consultée et affiche les informations légales via Pappers.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["https://api.pappers.fr/*", "https://*/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Radar société"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

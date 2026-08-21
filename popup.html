@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="head">
+    <h1>
+      <svg class="radar-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 12 L12 3 A9 9 0 0 1 20.8 10.8 Z" fill="currentColor" stroke="none" opacity="0.18"/>
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="5.5"/>
+        <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>
+        <line x1="12" y1="12" x2="12" y2="3"/>
+      </svg>
+      Radar société
+    </h1>
+    <div class="head-actions">
+      <button id="resetScan" class="head-icon" type="button" title="Vider le cache de cette page et relancer un scan sans Pappers">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+      <button id="openSettings" class="head-icon" type="button" title="Réglages">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="body">
+
+    <!-- Chargement / scan -->
+    <section id="state-loading" class="state on">
+      <div class="loader"><span class="dot"></span> Analyse de la page…</div>
+    </section>
+
+    <!-- Rien trouvé -->
+    <section id="state-empty" class="state">
+      <p class="hint center">Aucun SIREN ou SIRET détecté sur cette page,<br>
+      ni dans ses mentions légales ou CGV.</p>
+      <button id="rescan1" class="btn ghost" type="button">Relancer l'analyse</button>
+    </section>
+
+    <!-- Identifiant détecté ; la fiche société (si enrichie) s'ajoute dans
+         la même vue, pas de bascule vers un autre écran -->
+    <section id="state-found" class="state">
+      <div class="eyebrow" id="foundLabel">SIREN détecté</div>
+      <div class="page-info" id="pageInfo"></div>
+      <div class="alts" id="alts"></div>
+      <button id="enrich" class="btn" type="button">Enrichir avec Pappers</button>
+      <a id="voirPlus" class="voir-plus" href="#" style="display:none">Voir plus</a>
+      <div id="companyContent" class="company"></div>
+    </section>
+
+    <!-- Erreur -->
+    <section id="state-error" class="state">
+      <div class="error" id="errorMsg"></div>
+      <button id="rescan2" class="btn ghost" type="button" style="margin-top:12px">Relancer l'analyse</button>
+    </section>
+
+    <!-- Réglages : clé API + scans récents, sans quitter le popup -->
+    <section id="state-settings" class="state settings">
+      <div class="settings-block">
+        <div class="section-label">Clé API Pappers</div>
+        <div class="key-row">
+          <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Colle ta clé ici">
+          <button id="toggleShowKey" class="icon-btn" type="button" title="Afficher la clé">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 1 12s4 7 11 7a9.26 9.26 0 0 0 5.39-1.61"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+          <button id="removeKey" class="icon-btn danger" type="button" title="Retirer la clé" style="display:none">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+        <p class="hint" style="margin:8px 0 0">
+          Stockée localement sur ce poste, jamais transmise ailleurs qu'à Pappers.
+        </p>
+        <div class="key-actions">
+          <button id="saveKey" class="btn ghost" type="button">Enregistrer</button>
+          <span id="keySaved" class="saved-flag">Enregistré</span>
+        </div>
+        <div class="status-line" id="keyStatusLine"></div>
+      </div>
+
+      <div class="settings-block">
+        <div class="section-label-row">
+          <span class="section-label">Scans récents</span>
+          <button id="clearScans" class="link-btn" type="button">Vider</button>
+        </div>
+        <div class="scan-list" id="scanList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
